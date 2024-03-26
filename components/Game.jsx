@@ -1,30 +1,53 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
 
 const GameScreen = () => {
+  const screenWidth = Dimensions.get('window').width;
   const [jumping, setJumping] = useState(false);
+  const [positionY, setPositionY] = useState(0);
+  const obstaclePosition = useRef(new Animated.Value(screenWidth)).current; // Initial position of obstacle
 
   const handleJump = () => {
     if (!jumping) {
       setJumping(true);
-      // Implement jump animation or logic here
-      setTimeout(() => {
-        setJumping(false);
-      }, 500); // Reset jumping state after 500 milliseconds (adjust as needed)
+      Animated.sequence([
+        Animated.timing(positionY, { toValue: 100, duration: 250, useNativeDriver: true }), // Jump up
+        Animated.timing(positionY, { toValue: 0, duration: 250, useNativeDriver: true }), // Fall down
+      ]).start(() => setJumping(false));
     }
+  };
+
+  // Function to move the obstacle continuously from right to left
+  const moveObstacle = () => {
+    Animated.timing(obstaclePosition, {
+      toValue: -100, // Move off screen to the left
+      duration: 2000, // Duration for obstacle to cross the screen
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={require('../assets/images/background.png')} style={styles.backgroundImage} />
-      <Text style={styles.title}>Ur Dragon Game</Text>
       <View style={styles.gameArea}>
-        <Image source={require('../assets/images/ur.png')} style={styles.dragon} />
-        <Image source={require('../assets/images/rock.png')} style={styles.obstacle} />
-        <TouchableOpacity style={styles.touchArea} onPress={handleJump}>
-          {/* Touchable area to trigger jump */}
-        </TouchableOpacity>
+        {/* Scrolling background */}
+        <Image
+          source={require('../assets/images/background.png')}
+          style={{ width: '100%', height: '100%', position: 'absolute' }}
+          resizeMode="cover"
+        />
+        {/* Dragon */}
+        <Animated.Image
+          source={require('../assets/images/ur.png')}
+          style={[styles.dragon, { bottom: positionY }]}
+        />
+        {/* Obstacle */}
+        <Animated.Image
+          source={require('../assets/images/rock.png')}
+          style={[styles.obstacle, { right: obstaclePosition }]}
+        />
       </View>
+      {/* Touchable area to trigger jump */}
+      <TouchableOpacity style={styles.touchArea} onPress={handleJump} />
     </View>
   );
 };
@@ -35,44 +58,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: 'white', // Adjust text color based on background
-  },
   gameArea: {
     flex: 1,
     width: '100%',
-    backgroundColor: 'transparent', // Make game area transparent to show background
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative', // Needed for positioning absolute elements
+    position: 'relative',
   },
   dragon: {
     position: 'absolute',
-    bottom: jumping ? 200 : 100, // Adjust position based on jumping state
     width: 100,
     height: 100,
+    bottom: 0,
+    zIndex: 1, // Ensure dragon appears in front of obstacle
   },
   obstacle: {
     position: 'absolute',
-    bottom: 0,
     width: 50,
     height: 50,
-    left: 200,
+    bottom: 0,
+    zIndex: 0,
   },
   touchArea: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: '50%',
+    height: '100%',
     backgroundColor: 'transparent',
   },
 });
