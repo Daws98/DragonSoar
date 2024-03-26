@@ -4,7 +4,7 @@ import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react
 const MainMenuScreen = ({ navigation }) => {
   return (
     <ImageBackground
-      source={require('../assets/images/background.png')}
+      source={require('../assets/images/mainmenu.png')}
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
