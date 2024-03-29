@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, ImageBackground, Switch, Button, Alert, StyleSheet } from 'react-native';
+import { MusicContext } from '../utils/MusicContext';
 
 const OptionsScreen = ({ navigation }) => {
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
   const [musicEnabled, setMusicEnabled] = useState(true);
+  const { togglePlay } = useContext(MusicContext); // Access the togglePlay function from the MusicContext
 
   const handleClearData = () => {
     // Implement logic to clear stored data (e.g., high scores)
     Alert.alert('Data Cleared', 'High scores and other data have been cleared.');
+  };
+
+  const handleToggleMusic = () => {
+    togglePlay(); // Toggle music playback
+    setMusicEnabled(prevState => !prevState); // Update the musicEnabled state
   };
 
   return (
@@ -30,7 +37,7 @@ const OptionsScreen = ({ navigation }) => {
           <Text style={styles.optionText}>Music</Text>
           <Switch
             value={musicEnabled}
-            onValueChange={newValue => setMusicEnabled(newValue)}
+            onValueChange={handleToggleMusic} // Call handleToggleMusic when the switch value changes
           />
         </View>
 
