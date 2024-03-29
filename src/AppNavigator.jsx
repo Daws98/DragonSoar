@@ -1,9 +1,9 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import MainMenuScreen from './components/MainMenu.jsx';
-import OptionsScreen from './components/Options.jsx';
-import GameScreen from './components/Game.jsx';
-// import DeathScreen from './components/Death.jsx';
+import MainMenuScreen from './screens/MainMenu';
+import OptionsScreen from './screens/OptionScreen';
+import GameScreen from './screens/GameScreen';
+// import DeathScreen from './screens/DeathScreen';
 
 const Stack = createNativeStackNavigator();
 
