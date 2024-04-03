@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, {RepeatMode} from 'react-native-track-player';
 
 const MusicContext = createContext();
 
@@ -17,12 +17,18 @@ const MusicProvider = ({ children }) => {
         loop: true,
       });
 
+      TrackPlayer.setRepeatMode(RepeatMode.Track);
+
       // Start playing the track
       TrackPlayer.play();
       setIsPlaying(true);
     });
 
-    return () => TrackPlayer.destroy();
+    return () => {
+      // Stop and reset the player when the component unmounts
+      TrackPlayer.stop();
+      TrackPlayer.reset();
+    };
   }, []);
 
   const togglePlay = () => {
