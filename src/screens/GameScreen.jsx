@@ -7,7 +7,7 @@ const GameScreen = () => {
   const [jumping, setJumping] = useState(false);
   const [positionY, setPositionY] = useState(0);
   const obstaclePosition = useRef(new Animated.Value(screenWidth)).current; // Initial position of obstacle
-   const [score, setScore] = useState(0);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const scoreTimer = setInterval(() => {
@@ -39,18 +39,9 @@ const GameScreen = () => {
     outputRange: [0, -200, 0] // Adjust the height of the jump as needed
   });
 
-  // Function to move the obstacle continuously from right to left
-  const moveObstacle = () => {
-    Animated.timing(obstaclePosition, {
-      toValue: -100, // Move off screen to the left
-      duration: 2000, // Duration for obstacle to cross the screen
-      useNativeDriver: true,
-    }).start();
-  };
-
   return (
     <View style={styles.container}>
-            <Text style={styles.scoreText}>Score: {score}</Text>
+      <Text style={styles.scoreText}>Score: {score}</Text>
       <View style={styles.gameArea}>
         {/* Scrolling background */}
         <Image
@@ -66,12 +57,12 @@ const GameScreen = () => {
         {/* Obstacle */}
         <Animated.Image
           source={require('../assets/images/rock.png')}
-          style={[styles.obstacle, { right: obstaclePosition }]}
+          style={[styles.obstacle, { bottom: 0, right: 0 }]} // Place obstacle at bottom right corner
         />
       </View>
       {/* Touchable area to trigger jump */}
       {!jumping && (
-      <TouchableOpacity style={styles.touchArea} onPress={handleJump} />
+        <TouchableOpacity style={styles.touchArea} onPress={handleJump} />
       )}
     </View>
   );
@@ -97,9 +88,8 @@ const styles = StyleSheet.create({
   },
   obstacle: {
     position: 'absolute',
-    width: 50,
-    height: 50,
-    bottom: 0,
+    width: 100, // Adjust size of obstacle as needed
+    height: 100, // Adjust size of obstacle as needed
     zIndex: 0,
   },
   touchArea: {
@@ -108,6 +98,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: 'transparent',
+  },
+  scoreText: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 2, // Ensure score appears in front of other elements
+    color: 'white',
+    fontSize: 20,
   },
 });
 
