@@ -6,7 +6,7 @@ const GameScreen = () => {
   const [jumpAnim] = useState(new Animated.Value(0));
   const [jumping, setJumping] = useState(false);
   const [positionY, setPositionY] = useState(0);
-  const obstaclePosition = useRef(new Animated.Value(screenWidth)).current; // Initial position of obstacle
+  const [obstaclePositionX] = useState(new Animated.Value(screenWidth)); // Initial position of obstacle
   const [score, setScore] = useState(0);
 
   useEffect(() => {
@@ -39,6 +39,28 @@ const GameScreen = () => {
     outputRange: [0, -200, 0] // Adjust the height of the jump as needed
   });
 
+  useEffect(() => {
+    const moveObstacle = () => {
+      Animated.timing(obstaclePositionX, {
+        toValue: -100, // Move off screen to the left
+        duration: 3000, // Adjust the duration as needed
+        useNativeDriver: true,
+      }).start(() => {
+        // Reset the obstacle position back to the right side of the screen
+        obstaclePositionX.setValue(screenWidth);
+        // Schedule the next movement after a random interval
+        setTimeout(moveObstacle, Math.random() * 3000 + 2000); // Random interval between 2 to 5 seconds
+      });
+    };
+
+    moveObstacle();
+
+    return () => {
+      // Clean up any running animations
+      obstaclePositionX.stopAnimation();
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.scoreText}>Score: {score}</Text>
@@ -57,7 +79,7 @@ const GameScreen = () => {
         {/* Obstacle */}
         <Animated.Image
           source={require('../assets/images/rock.png')}
-          style={[styles.obstacle, { bottom: 0, right: 0 }]} // Place obstacle at bottom right corner
+          style={[styles.obstacle, { bottom: 0, transform: [{ translateX: obstaclePositionX }] }]} // Move obstacle towards the dragon
         />
       </View>
       {/* Touchable area to trigger jump */}
