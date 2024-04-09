@@ -59,6 +59,7 @@ const GameScreen = () => {
 
   const handleJump = () => {
     if (!jumping) {
+      jumpSound.current.play();
       setJumping(true);
       jumpAnim.setValue(0); // Reset the Animated.Value
       Animated.timing(jumpAnim, {
@@ -67,7 +68,6 @@ const GameScreen = () => {
         useNativeDriver: false,
       }).start(() => {
         setJumping(false);
-        jumpSound.current.play();
       });
     }
   };
@@ -85,7 +85,6 @@ const GameScreen = () => {
   useEffect(() => {
     jumpingRef.current = jumping;
     const jumpCheckInterval = setInterval(() => {
-      console.log("Jumping status:", jumping);
     }, 100);
   
     // Clear the interval when component unmounts or when game over
