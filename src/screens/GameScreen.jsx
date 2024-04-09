@@ -1,69 +1,97 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const GameScreen = () => {
+  const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
   const [jumpAnim] = useState(new Animated.Value(0));
   const [jumping, setJumping] = useState(false);
   const [positionY, setPositionY] = useState(0);
   const [obstaclePositionX] = useState(new Animated.Value(screenWidth)); // Initial position of obstacle
   const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false); // State to track game over
+  const jumpingRef = useRef(jumping);
 
   useEffect(() => {
     const scoreTimer = setInterval(() => {
-      if (!jumping) {
-        setScore(score => score + 1); // Increment score only if not jumping
+      if (!jumpingRef.current && !gameOver) {
+        setScore((score) => score + 1);
       }
-    }, 100); // Adjust the interval as needed for score increase speed
-    return () => clearInterval(scoreTimer);
-  }, [jumping]);
+    }, 100);
+  
+    const moveObstacle = () => {
+      Animated.timing(obstaclePositionX, {
+        toValue: -100,
+        duration: 3000,
+        useNativeDriver: true,
+      }).start(() => {
+        obstaclePositionX.setValue(screenWidth);
+        setTimeout(moveObstacle, Math.random() * 3000 + 2000);
+      });
+
+      obstaclePositionX.addListener(({ value }) => {
+        // Check for collision
+        if (!jumpingRef.current && value < 25 && value > -25) {
+          setGameOver(true);
+        }
+      });
+    };
+
+  
+    moveObstacle();
+  
+    return () => {
+      clearInterval(scoreTimer);
+      obstaclePositionX.stopAnimation();
+    };
+  }, [gameOver]);
 
   const handleJump = () => {
-    setJumping(true);
-    Animated.timing(
-      jumpAnim,
-      {
+    if (!jumping) {
+      setJumping(true);
+      jumpAnim.setValue(0); // Reset the Animated.Value
+      Animated.timing(jumpAnim, {
         toValue: 1,
         duration: 800,
-        useNativeDriver: true
-      }
-    ).start(() => {
-      // Reset the animation value after the jump is complete
-      jumpAnim.setValue(0);
-      setJumping(false);
-    });
+        useNativeDriver: false,
+      }).start(() => {
+        setJumping(false);
+      });
+    }
   };
+  
 
   const jumpHeight = jumpAnim.interpolate({
     inputRange: [0, 0.5 ,1],
     outputRange: [0, -200, 0] // Adjust the height of the jump as needed
   });
 
+  const handleReturnToMenu = () => {
+    navigation.navigate('MainMenu');
+  };
+
   useEffect(() => {
-    const moveObstacle = () => {
-      Animated.timing(obstaclePositionX, {
-        toValue: -100, // Move off screen to the left
-        duration: 3000, // Adjust the duration as needed
-        useNativeDriver: true,
-      }).start(() => {
-        // Reset the obstacle position back to the right side of the screen
-        obstaclePositionX.setValue(screenWidth);
-        // Schedule the next movement after a random interval
-        setTimeout(moveObstacle, Math.random() * 3000 + 2000); // Random interval between 2 to 5 seconds
-      });
-    };
-
-    moveObstacle();
-
-    return () => {
-      // Clean up any running animations
-      obstaclePositionX.stopAnimation();
-    };
-  }, []);
-
+    jumpingRef.current = jumping;
+    const jumpCheckInterval = setInterval(() => {
+      console.log("Jumping status:", jumping);
+    }, 100);
+  
+    // Clear the interval when component unmounts or when game over
+    return () => clearInterval(jumpCheckInterval);
+  }, [jumping]);
+  
   return (
     <View style={styles.container}>
       <Text style={styles.scoreText}>Score: {score}</Text>
+      {gameOver && (
+        <View style={styles.gameOverContainer}>
+          <Text style={styles.gameOverText}>Game Over</Text>
+          <TouchableOpacity style={styles.menuButton} onPress={handleReturnToMenu}>
+            <Text style={styles.menuButtonText}>Back to Menu</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.gameArea}>
         {/* Scrolling background */}
         <Image
@@ -78,12 +106,13 @@ const GameScreen = () => {
         />
         {/* Obstacle */}
         <Animated.Image
+        ref={(ref) => { this.obstacle = ref; }}
           source={require('../assets/images/rock.png')}
           style={[styles.obstacle, { bottom: 0, transform: [{ translateX: obstaclePositionX }] }]} // Move obstacle towards the dragon
         />
       </View>
       {/* Touchable area to trigger jump */}
-      {!jumping && (
+      {!jumping && !gameOver && (
         <TouchableOpacity style={styles.touchArea} onPress={handleJump} />
       )}
     </View>
@@ -128,6 +157,27 @@ const styles = StyleSheet.create({
     zIndex: 2, // Ensure score appears in front of other elements
     color: 'white',
     fontSize: 20,
+  },
+  gameOverContainer: {
+    position: 'absolute',
+    top: '50%',
+    zIndex: 2,
+    alignItems: 'center',
+  },
+  gameOverText: {
+    color: 'red',
+    fontSize: 40,
+  },
+  menuButton: {
+    marginTop: 20,
+    backgroundColor: 'blue',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  menuButtonText: {
+    color: 'white',
+    fontSize: 18,
   },
 });
 
