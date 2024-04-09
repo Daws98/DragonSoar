@@ -21,7 +21,17 @@ const GameScreen = () => {
     }
   }));
 
+  const deathSound = useRef(new Sound('death_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
+    if (error) {
+      console.log('Failed to load the sound', error);
+      return;
+    }
+  }));
+
+
   jumpSound.current.setVolume(1.0);
+  deathSound.current.setVolume(0.8);
+  
 
   useEffect(() => {
     const scoreTimer = setInterval(() => {
@@ -44,6 +54,7 @@ const GameScreen = () => {
         // Check for collision
         if (!jumpingRef.current && value < 25 && value > -25) {
           setGameOver(true);
+          //deathSound.current.play();
         }
       });
     };
