@@ -1,20 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
+import Sound from 'react-native-sound';
 
 const GameScreen = () => {
   const screenWidth = Dimensions.get('window').width;
   const [jumpAnim] = useState(new Animated.Value(0));
   const [jumping, setJumping] = useState(false);
   const [positionY, setPositionY] = useState(0);
-  const [obstaclePositionX] = useState(new Animated.Value(screenWidth)); // Initial position of obstacle
+  const [obstaclePositionX] = useState(new Animated.Value(screenWidth));
   const [score, setScore] = useState(0);
+
+  const jumpSound = useRef(new Sound('jump_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
+    if (error) {
+      console.log('Failed to load the sound', error);
+      return;
+    }
+  }));
+
+  jumpSound.current.setVolume(1.0);
 
   useEffect(() => {
     const scoreTimer = setInterval(() => {
       if (!jumping) {
-        setScore(score => score + 1); // Increment score only if not jumping
+        setScore(score => score + 1);
       }
-    }, 100); // Adjust the interval as needed for score increase speed
+    }, 100);
     return () => clearInterval(scoreTimer);
   }, [jumping]);
 
@@ -28,35 +38,32 @@ const GameScreen = () => {
         useNativeDriver: true
       }
     ).start(() => {
-      // Reset the animation value after the jump is complete
       jumpAnim.setValue(0);
       setJumping(false);
     });
+    jumpSound.current.play();
   };
 
   const jumpHeight = jumpAnim.interpolate({
     inputRange: [0, 0.5 ,1],
-    outputRange: [0, -200, 0] // Adjust the height of the jump as needed
+    outputRange: [0, -200, 0]
   });
 
   useEffect(() => {
     const moveObstacle = () => {
       Animated.timing(obstaclePositionX, {
-        toValue: -100, // Move off screen to the left
-        duration: 3000, // Adjust the duration as needed
+        toValue: -100,
+        duration: 3000,
         useNativeDriver: true,
       }).start(() => {
-        // Reset the obstacle position back to the right side of the screen
         obstaclePositionX.setValue(screenWidth);
-        // Schedule the next movement after a random interval
-        setTimeout(moveObstacle, Math.random() * 3000 + 2000); // Random interval between 2 to 5 seconds
+        setTimeout(moveObstacle, Math.random() * 3000 + 2000);
       });
     };
 
     moveObstacle();
 
     return () => {
-      // Clean up any running animations
       obstaclePositionX.stopAnimation();
     };
   }, []);
@@ -79,7 +86,7 @@ const GameScreen = () => {
         {/* Obstacle */}
         <Animated.Image
           source={require('../assets/images/rock.png')}
-          style={[styles.obstacle, { bottom: 0, transform: [{ translateX: obstaclePositionX }] }]} // Move obstacle towards the dragon
+          style={[styles.obstacle, { bottom: 0, transform: [{ translateX: obstaclePositionX }] }]}
         />
       </View>
       {/* Touchable area to trigger jump */}
@@ -106,12 +113,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     bottom: 0,
-    zIndex: 1, // Ensure dragon appears in front of obstacle
+    zIndex: 1,
   },
   obstacle: {
     position: 'absolute',
-    width: 100, // Adjust size of obstacle as needed
-    height: 100, // Adjust size of obstacle as needed
+    width: 100,
+    height: 100,
     zIndex: 0,
   },
   touchArea: {
@@ -125,7 +132,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 20,
-    zIndex: 2, // Ensure score appears in front of other elements
+    zIndex: 2,
     color: 'white',
     fontSize: 20,
   },
