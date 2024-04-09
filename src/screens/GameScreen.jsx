@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Sound from 'react-native-sound';
 
 const GameScreen = () => {
   const navigation = useNavigation();
@@ -12,6 +13,15 @@ const GameScreen = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false); // State to track game over
   const jumpingRef = useRef(jumping);
+
+   const jumpSound = useRef(new Sound('jump_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
+    if (error) {
+      console.log('Failed to load the sound', error);
+      return;
+    }
+  }));
+
+  jumpSound.current.setVolume(1.0);
 
   useEffect(() => {
     const scoreTimer = setInterval(() => {
@@ -49,6 +59,7 @@ const GameScreen = () => {
 
   const handleJump = () => {
     if (!jumping) {
+      jumpSound.current.play();
       setJumping(true);
       jumpAnim.setValue(0); // Reset the Animated.Value
       Animated.timing(jumpAnim, {
