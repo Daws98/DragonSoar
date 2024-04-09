@@ -5,7 +5,7 @@ import { MusicContext } from '../utils/MusicContext';
 const OptionsScreen = ({ navigation }) => {
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
   const [musicEnabled, setMusicEnabled] = useState(true);
-  const { togglePlay } = useContext(MusicContext); // Access the togglePlay function from the MusicContext
+  const { togglePlay } = useContext(MusicContext);
 
   const handleClearData = () => {
     // Implement logic to clear stored data (e.g., high scores)
@@ -13,8 +13,12 @@ const OptionsScreen = ({ navigation }) => {
   };
 
   const handleToggleMusic = () => {
-    togglePlay(); // Toggle music playback
-    setMusicEnabled(prevState => !prevState); // Update the musicEnabled state
+    togglePlay();
+    setMusicEnabled(prevState => !prevState);
+  };
+
+  const handleToggleSoundEffects = () => {
+    setSoundEffectsEnabled(prevState => !prevState);
   };
 
   return (
@@ -26,18 +30,10 @@ const OptionsScreen = ({ navigation }) => {
         <Text style={styles.title}>Options</Text>
 
         <View style={styles.optionContainer}>
-          <Text style={styles.optionText}>Sound Effects</Text>
-          <Switch
-            value={soundEffectsEnabled}
-            onValueChange={newValue => setSoundEffectsEnabled(newValue)}
-          />
-        </View>
-
-        <View style={styles.optionContainer}>
           <Text style={styles.optionText}>Music</Text>
           <Switch
             value={musicEnabled}
-            onValueChange={handleToggleMusic} // Call handleToggleMusic when the switch value changes
+            onValueChange={handleToggleMusic}
           />
         </View>
 
