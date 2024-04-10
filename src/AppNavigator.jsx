@@ -48,7 +48,7 @@ Realm.open({ schema: [HighScoreSchema] })
 <Stack.Screen
   name="Death"
   options={{ headerShown: false }}
-  children={(props) => <DeathScreen {...props} realm={realm} highScore={highScore} setHighScore={setHighScore} />}
+  children={(props) => <DeathScreen {...props} realm={realm} highScore={highScore}/>}
 />
     </Stack.Navigator>
   );
