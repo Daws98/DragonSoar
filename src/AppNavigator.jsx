@@ -5,7 +5,7 @@ import MainMenuScreen from './screens/MainMenu';
 import OptionsScreen from './screens/OptionScreen';
 import GameScreen from './screens/GameScreen';
 import Realm from 'realm';
-// import DeathScreen from './screens/DeathScreen';
+import DeathScreen from './screens/DeathScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,7 +45,11 @@ Realm.open({ schema: [HighScoreSchema] })
   options={{ headerShown: false }}
   children={(props) => <GameScreen {...props} realm={realm} highScore={highScore} setHighScore={setHighScore} />}
 />
-      {/* <Stack.Screen name="Death" component={DeathScreen} /> */}
+<Stack.Screen
+  name="Death"
+  options={{ headerShown: false }}
+  children={(props) => <DeathScreen {...props} realm={realm} highScore={highScore} setHighScore={setHighScore} />}
+/>
     </Stack.Navigator>
   );
 };
