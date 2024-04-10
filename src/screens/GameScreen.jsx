@@ -2,6 +2,24 @@ import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Sound from 'react-native-sound';
+import Realm from 'realm';
+
+const HighScoreSchema = {
+  name: 'HighScore',
+  properties: {
+    score: 'int',
+  },
+};
+
+let realm;
+
+  Realm.open({ schema: [HighScoreSchema] })
+  .then((openedRealm) => {
+    realm = openedRealm;
+  })
+  .catch((error) => {
+    console.log('Failed to open realm:', error);
+  });
 
 const GameScreen = () => {
   const navigation = useNavigation();
@@ -13,6 +31,7 @@ const GameScreen = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false); // State to track game over
   const jumpingRef = useRef(jumping);
+  const [highScore, setHighScore] = useState(null);
 
    const jumpSound = useRef(new Sound('jump_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
     if (error) {
@@ -22,6 +41,16 @@ const GameScreen = () => {
   }));
 
   jumpSound.current.setVolume(1.0);
+
+  useEffect(() => {
+    console.log("Component mounted, fetching high score...");
+    const highScores = realm.objects('HighScore');
+    console.log("High scores:", highScores);
+    if (highScores.length > 0) {
+      console.log("Setting high score:", highScores[0].score);
+      setHighScore(highScores[0].score);
+    }
+  }, []);
   
   useEffect(() => {
     const scoreTimer = setInterval(() => {
@@ -29,7 +58,7 @@ const GameScreen = () => {
         setScore((score) => score + 1);
       }
     }, 100);
-  
+    
     const moveObstacle = () => {
       Animated.timing(obstaclePositionX, {
         toValue: -100,
@@ -44,6 +73,13 @@ const GameScreen = () => {
         // Check for collision
         if (!jumpingRef.current && value < 25 && value > -25) {
           setGameOver(true);
+          if (score > highScore) {
+            realm.write(() => {
+              realm.delete(realm.objects('HighScore'));
+              realm.create('HighScore', { score });
+            });
+            setHighScore(score);
+          }
         }
       });
     };
@@ -93,6 +129,7 @@ const GameScreen = () => {
   
   return (
     <View style={styles.container}>
+      <Text style={styles.highScoreText}>High Score: {highScore !== null ? highScore : 'Loading...'}</Text>
       <Text style={styles.scoreText}>Score: {score}</Text>
       {gameOver && (
         <View style={styles.gameOverContainer}>
@@ -164,6 +201,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 20,
+    zIndex: 2, // Ensure score appears in front of other elements
+    color: 'white',
+    fontSize: 20,
+  },
+  highScoreText: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
     zIndex: 2, // Ensure score appears in front of other elements
     color: 'white',
     fontSize: 20,

@@ -1,15 +1,46 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ImageBackground, Switch, Button, Alert, StyleSheet } from 'react-native';
 import { MusicContext } from '../utils/MusicContext';
+import Realm from 'realm';
+
+
+const HighScoreSchema = {
+  name: 'HighScore',
+  properties: {
+    score: 'int',
+  },
+};
+
+let realm;
 
 const OptionsScreen = ({ navigation }) => {
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
   const [musicEnabled, setMusicEnabled] = useState(true);
   const { togglePlay } = useContext(MusicContext);
 
+  useEffect(() => {
+    Realm.open({ schema: [HighScoreSchema] })
+      .then((openedRealm) => {
+        realm = openedRealm;
+      })
+      .catch((error) => {
+        console.log('Failed to open realm:', error);
+      });
+  }, []);
+
   const handleClearData = () => {
-    // Implement logic to clear stored data (e.g., high scores)
-    Alert.alert('Data Cleared', 'High scores and other data have been cleared.');
+    if (realm) { // Ensure realm is initialized before using it
+      realm.write(() => {
+        const highScores = realm.objects('HighScore');
+        if (highScores.length > 0) {
+          highScores[0].score = 0;
+        } else {
+          realm.create('HighScore', { score: 0 });
+        }
+      });
+    } else {
+      console.log('Realm is not initialized.');
+    }
   };
 
   const handleToggleMusic = () => {
