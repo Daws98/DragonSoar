@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, Button, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
 
 
 const DeathScreen = ({ score, highScore, setHighScore, navigation }) => {
@@ -12,7 +12,12 @@ const DeathScreen = ({ score, highScore, setHighScore, navigation }) => {
       <View style={styles.container}>
         <Text style={styles.gameOverText}>Game Over</Text>
         <Text style={styles.scoreText}>High Score: {highScore}</Text>
-        <Button title="Main Menu" onPress={() => navigation.navigate('MainMenu')} />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('MainMenu')}
+        >
+          <Text style={styles.buttonText}>Main Menu</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -28,18 +33,12 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'white', // Set color to white
+    color: 'white',
   },
   scoreText: {
     fontSize: 20,
     marginBottom: 20,
-    color: 'white', // Set color to white
-  },
-  highScoreText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: 'green', // You can adjust the color for the high score text as needed
+    color: 'white', 
   },
   backgroundImage: {
     flex: 1,
@@ -47,6 +46,17 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  button: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 
