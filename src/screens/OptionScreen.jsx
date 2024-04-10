@@ -69,7 +69,7 @@ const OptionsScreen = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleClearData}
+          onPress={() => handleClearData()}
         >
           <Text style={styles.buttonText}>Clear Data</Text>
         </TouchableOpacity>
