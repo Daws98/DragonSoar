@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ImageBackground, Switch, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, ImageBackground, Switch, Button, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import { MusicContext } from '../utils/MusicContext';
 import Realm from 'realm';
 
@@ -29,7 +29,7 @@ const OptionsScreen = ({ navigation }) => {
   }, []);
 
   const handleClearData = () => {
-    if (realm) { // Ensure realm is initialized before using it
+    if (realm) { 
       realm.write(() => {
         const highScores = realm.objects('HighScore');
         if (highScores.length > 0) {
@@ -67,10 +67,18 @@ const OptionsScreen = ({ navigation }) => {
             onValueChange={handleToggleMusic}
           />
         </View>
-
-        <Button title="Clear Data" onPress={handleClearData} />
-
-        <Button title="Back" onPress={() => navigation.goBack()} />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleClearData}
+        >
+          <Text style={styles.buttonText}>Clear Data</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>Back</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -100,6 +108,17 @@ const styles = StyleSheet.create({
   },
   optionText: {
     marginRight: 10,
+    color: 'white',
+  },
+  button: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
     color: 'white',
   },
 });

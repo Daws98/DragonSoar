@@ -27,9 +27,9 @@ const GameScreen = () => {
   const [jumpAnim] = useState(new Animated.Value(0));
   const [jumping, setJumping] = useState(false);
   const [positionY, setPositionY] = useState(0);
-  const [obstaclePositionX] = useState(new Animated.Value(screenWidth)); // Initial position of obstacle
+  const [obstaclePositionX] = useState(new Animated.Value(screenWidth));
   const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false); // State to track game over
+  const [gameOver, setGameOver] = useState(false);
   const jumpingRef = useRef(jumping);
   const [highScore, setHighScore] = useState(null);
 
@@ -97,7 +97,7 @@ const GameScreen = () => {
     if (!jumping) {
       jumpSound.current.play();
       setJumping(true);
-      jumpAnim.setValue(0); // Reset the Animated.Value
+      jumpAnim.setValue(0);
       Animated.timing(jumpAnim, {
         toValue: 1,
         duration: 800,
@@ -111,7 +111,7 @@ const GameScreen = () => {
 
   const jumpHeight = jumpAnim.interpolate({
     inputRange: [0, 0.5 ,1],
-    outputRange: [0, -200, 0] // Adjust the height of the jump as needed
+    outputRange: [0, -200, 0]
   });
 
   const handleReturnToMenu = () => {
@@ -123,13 +123,12 @@ const GameScreen = () => {
     const jumpCheckInterval = setInterval(() => {
     }, 100);
   
-    // Clear the interval when component unmounts or when game over
     return () => clearInterval(jumpCheckInterval);
   }, [jumping]);
 
   useEffect(() => {
     if (gameOver) {
-      navigation.navigate('Death'); // Assuming 'DeathScreen' is the name of your death screen component
+      navigation.navigate('Death');
     }
   }, [gameOver, navigation]);
 
@@ -139,7 +138,7 @@ const GameScreen = () => {
       <Text style={styles.scoreText}>Score: {score}</Text>
 
       <View style={styles.gameArea}>
-        {/* Scrolling background */}
+        {/* Background */}
         <Image
           source={require('../assets/images/background.png')}
           style={{ width: '100%', height: '100%', position: 'absolute' }}
@@ -154,7 +153,7 @@ const GameScreen = () => {
         <Animated.Image
         ref={(ref) => { this.obstacle = ref; }}
           source={require('../assets/images/rock.png')}
-          style={[styles.obstacle, { bottom: 0, transform: [{ translateX: obstaclePositionX }] }]} // Move obstacle towards the dragon
+          style={[styles.obstacle, { bottom: 0, transform: [{ translateX: obstaclePositionX }] }]}
         />
       </View>
       {/* Touchable area to trigger jump */}
