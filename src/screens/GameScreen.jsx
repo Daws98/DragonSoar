@@ -126,19 +126,18 @@ const GameScreen = () => {
     // Clear the interval when component unmounts or when game over
     return () => clearInterval(jumpCheckInterval);
   }, [jumping]);
-  
+
+  useEffect(() => {
+    if (gameOver) {
+      navigation.navigate('Death'); // Assuming 'DeathScreen' is the name of your death screen component
+    }
+  }, [gameOver, navigation]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.highScoreText}>High Score: {highScore !== null ? highScore : 'Loading...'}</Text>
       <Text style={styles.scoreText}>Score: {score}</Text>
-      {gameOver && (
-        <View style={styles.gameOverContainer}>
-          <Text style={styles.gameOverText}>Game Over</Text>
-          <TouchableOpacity style={styles.menuButton} onPress={handleReturnToMenu}>
-            <Text style={styles.menuButtonText}>Back to Menu</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+
       <View style={styles.gameArea}>
         {/* Scrolling background */}
         <Image

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, ImageBackground } from 'react-native';
+
 
 const DeathScreen = ({ score, highScore, setHighScore, navigation }) => {
   const [newHighScore, setNewHighScore] = useState(false);
+
 
   useEffect(() => {
     // Check if the current score is higher than the high score
@@ -12,15 +14,22 @@ const DeathScreen = ({ score, highScore, setHighScore, navigation }) => {
     }
   }, [score, highScore, setHighScore]);
 
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.gameOverText}>Game Over</Text>
-      <Text style={styles.scoreText}>Score: {score}</Text>
-      {newHighScore && <Text style={styles.highScoreText}>New Highscore!</Text>}
-      <Button title="Main Menu" onPress={() => navigation.navigate('MainMenu')} />
-    </View>
+    <ImageBackground
+      source={require('../assets/images/mainmenu.png')}
+      style={styles.backgroundImage}
+    >
+      <View style={styles.container}>
+        <Text style={styles.gameOverText}>Game Over</Text>
+        <Text style={styles.scoreText}>Score: {score}</Text>
+        {newHighScore && <Text style={styles.highScoreText}>New Highscore!</Text>}
+        <Button title="Main Menu" onPress={() => navigation.navigate('MainMenu')} />
+      </View>
+    </ImageBackground>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -32,17 +41,29 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'white', // Set color to white
   },
   scoreText: {
     fontSize: 20,
     marginBottom: 20,
+    color: 'white', // Set color to white
   },
   highScoreText: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'green',
+    color: 'green', // You can adjust the color for the high score text as needed
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
+
 export default DeathScreen;
+
+
